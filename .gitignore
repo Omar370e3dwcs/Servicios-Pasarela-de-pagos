@@ -1,0 +1,18 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build
+target/
+*.class
+*.jar
+
+# Environment
+application.properties
+.env
+
+# OS
+.DS_Store
+Thumbs.db
