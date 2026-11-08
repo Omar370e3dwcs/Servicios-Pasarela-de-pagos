@@ -1,0 +1,11 @@
+pago\PasarelaPagosApplication.class
+pago\controlador\PagoControlador.class
+pago\repositorio\FacturaRepository.class
+pago\modelo\Factura.class
+pago\servicio\FacturaService.class
+pago\servicio\PagoService.class
+pago\dto\FacturaDatos.class
+pago\repositorio\PagoRepository.class
+pago\controlador\FacturaControlador.class
+pago\modelo\Pago.class
+pago\dto\PagoDatos.class
