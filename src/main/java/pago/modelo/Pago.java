@@ -5,17 +5,18 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 @Entity
-@Table(name = "pagos")
+@Table(name = "pagos", indexes = {
+    @Index(name = "idx_pagos_organizacion", columnList = "organizacion_id")
+})
 
 public class Pago {
-    
-    
-    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
-    
+
+    @Column(name = "organizacion_id", nullable = false, length = 64)
+    private String organizacionId;
+
     @Column(name = "id_paciente", nullable = false)
     private Integer idPaciente;
     
@@ -42,7 +43,14 @@ public class Pago {
     
     private String observaciones;
 
-    
+    public String getOrganizacionId() {
+        return organizacionId;
+    }
+
+    public void setOrganizacionId(String organizacionId) {
+        this.organizacionId = organizacionId;
+    }
+
     public Integer getId() {
         return id;
     }

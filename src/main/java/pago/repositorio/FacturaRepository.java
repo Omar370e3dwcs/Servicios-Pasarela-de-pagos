@@ -8,8 +8,7 @@ import java.util.Optional;
 
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Integer> {
-    
-    Optional<Factura> findByNumeroFactura(String numeroFactura);
-    List<Factura> findByIdPago(Integer idPago);
-    List<Factura> findByEstado(String estado);
+    Optional<Factura> findByIdAndOrganizacionId(Integer id, String organizacionId);
+    List<Factura> findAllByOrganizacionId(String organizacionId);
+    List<Factura> findByOrganizacionIdAndIdPago(String organizacionId, Integer idPago);
 }

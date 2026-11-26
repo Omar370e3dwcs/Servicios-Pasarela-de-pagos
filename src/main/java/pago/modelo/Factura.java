@@ -5,13 +5,20 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "facturas")
+@Table(name = "facturas",
+       uniqueConstraints = @UniqueConstraint(
+           name = "uk_factura_org_numero",
+           columnNames = {"organizacion_id", "numero_factura"}),
+       indexes = @Index(name = "idx_facturas_organizacion", columnList = "organizacion_id"))
 public class Factura {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
+    @Column(name = "organizacion_id", nullable = false, length = 64)
+    private String organizacionId;
+
     @Column(name = "id_pago", nullable = false)
     private Integer idPago;
     
@@ -28,6 +35,14 @@ public class Factura {
     
     @Column(name = "fecha_emision")
     private LocalDateTime fechaEmision = LocalDateTime.now();
+
+    public String getOrganizacionId() {
+        return organizacionId;
+    }
+
+    public void setOrganizacionId(String organizacionId) {
+        this.organizacionId = organizacionId;
+    }
 
     
     public Integer getId() {

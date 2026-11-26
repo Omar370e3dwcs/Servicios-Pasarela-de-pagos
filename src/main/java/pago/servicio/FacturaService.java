@@ -4,7 +4,11 @@ import pago.dto.FacturaDatos;
 import pago.modelo.Factura;
 import pago.repositorio.FacturaRepository;
 import pago.repositorio.PagoRepository;
+import pago.saas.ContextoOrganizacion;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import java.util.List;
 
 @Service
@@ -26,17 +30,20 @@ public class FacturaService {
     
     
     public Factura generar(FacturaDatos datos){
-        
         if(datos.getIdPago() == null || 
            datos.getTotal() == null){
-            throw new RuntimeException("Falta id pago o total");
+            throw new ResponseStatusException(BAD_REQUEST, "Falta id pago o total");
         }
-        
-        
-    
-        String numero = "FAC-" + System.currentTimeMillis();
+
+        String organizacionId = ContextoOrganizacion.organizacionActual();
+        pagoRepo.findByIdAndOrganizacionId(datos.getIdPago(), organizacionId)
+            .orElseThrow(() -> new ResponseStatusException(
+                BAD_REQUEST, "El pago no pertenece a la organización"));
+
+        String numero = "FAC-" + organizacionId + "-" + System.currentTimeMillis();
         
         Factura f = new Factura();
+        f.setOrganizacionId(organizacionId);
         f.setIdPago(datos.getIdPago());
         f.setNumeroFactura(numero);
         f.setTotal(datos.getTotal());
@@ -48,27 +55,25 @@ public class FacturaService {
     
     
     public Factura obtener(Integer id){
-        return repo.findById(id).orElse(null);
-    
+        return buscar(id);
     }
     
     // Obtiene todas
     
     public List<Factura> todas(){
-        return repo.findAll();
+        return repo.findAllByOrganizacionId(ContextoOrganizacion.organizacionActual());
     }
     
     
     public Factura anular(Integer id){
-        Factura f = repo.findById(id).orElse(null);
-        
-        if(f != null){
-            f.setEstado("anulada");
-            repo.save(f);
-        }
-        
-        
-        
-        return f;
+        Factura f = buscar(id);
+        f.setEstado("anulada");
+        return repo.save(f);
+    }
+
+    private Factura buscar(Integer id) {
+        return repo.findByIdAndOrganizacionId(
+                id, ContextoOrganizacion.organizacionActual())
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Factura no encontrada"));
     }
 }

@@ -3,7 +3,10 @@ package pago.servicio;
 import pago.dto.PagoDatos;
 import pago.modelo.Pago;
 import pago.repositorio.PagoRepository;
+import pago.saas.ContextoOrganizacion;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import java.util.List;
 
 
@@ -21,51 +24,54 @@ public class PagoService {
     
     
     public Pago registrar(PagoDatos datos){
-        
         if(datos.getIdPaciente() == null || 
            datos.getMonto() == null){
-            throw new RuntimeException("Falta id paciente o monto");
+            throw new ResponseStatusException(
+                org.springframework.http.HttpStatus.BAD_REQUEST,
+                "Falta id paciente o monto");
         }
         
         Pago p = new Pago();
+        p.setOrganizacionId(ContextoOrganizacion.organizacionActual());
         p.setIdPaciente(datos.getIdPaciente());
+        p.setIdCita(datos.getIdCita());
         p.setMonto(datos.getMonto());
         p.setMetodoPago(datos.getMetodoPago());
+        p.setReferenciaPago(datos.getReferenciaPago());
+        p.setObservaciones(datos.getObservaciones());
         p.setEstado("pendiente");
         
         return repo.save(p);
     }
     
     public Pago obtener(Integer id){
-        return repo.findById(id).orElse(null);
+        return buscar(id);
     }
     
     
     
     // Retorna todos los pagos
     public List<Pago> todos(){
-        return repo.findAll();
+        return repo.findAllByOrganizacionId(ContextoOrganizacion.organizacionActual());
     }
     
     public Pago confirmar(Integer id){
-        Pago p = repo.findById(id).orElse(null);
-        if(p != null){
-            p.setEstado("confirmado");
-            repo.save(p);
-        }
-        return p;
+        Pago p = buscar(id);
+        p.setEstado("confirmado");
+        return repo.save(p);
     }
     
     // Cancela el pago
     
     public Pago cancelar(Integer id){
-        Pago p = repo.findById(id).orElse(null);
-        
-        if(p != null){
-            p.setEstado("cancelado");
-            repo.save(p);
-        }
-        
-        return p;
+        Pago p = buscar(id);
+        p.setEstado("cancelado");
+        return repo.save(p);
+    }
+
+    public Pago buscar(Integer id) {
+        return repo.findByIdAndOrganizacionId(
+                id, ContextoOrganizacion.organizacionActual())
+            .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Pago no encontrado"));
     }
 }
