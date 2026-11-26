@@ -4,8 +4,7 @@
 
 Este repositorio contiene únicamente el **servicio de pasarela de pagos** de un
 proyecto de cuatro servicios. Sus responsabilidades son pagos, facturas y la
-configuración de cobro. Los otros tres servicios pertenecen a los demás compañeros
-y se representan como servicios consumidores/proveedores externos.
+configuración de cobro. 
 
 Una instalación y un despliegue del servicio de pagos atienden a varias
 organizaciones sin mezclar sus datos.
